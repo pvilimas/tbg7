@@ -1,6 +1,7 @@
-COMP = clang++
-CFLAGS = -std=c++2a -Wall -Wextra -pedantic -O2
-LFLAGS = -lm -Iinclude -lraylib -L/usr/local/include/raylib/raylib/ -framework iokit -framework Cocoa -framework OpenGL
+COMP = g++
+CFLAGS = -std=c++2a -Wall -Wextra -pedantic -O2 -mmacosx-version-min=11 -stdlib=libc++
+LFLAGS = -Iinclude/raylib/include -lraylib -Linclude/raylib \
+-framework iokit -framework Cocoa -framework OpenGL -lm
 SRC = main.cpp game.cpp
 PLATFORM = mac
 
@@ -12,7 +13,7 @@ main: $(SRC)
 	@cp -rf ./assets build/$(PLATFORM)/
 
 build: main
-	@echo "Compiling..."
+	@printf "Compiling...\n"
 
 dist: clean build
 	@cp -rf ./assets dist/$(PLATFORM)/
