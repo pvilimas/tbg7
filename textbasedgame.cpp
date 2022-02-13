@@ -22,5 +22,11 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
 }
 
 void TextBasedGame::EvalPlayerInput(std::string s) {
-    std::cout << "evaling string: " << s << std::endl;
+    if (s == "quit") {
+        exit(0);
+    } else if (s == "help") {
+        WriteGameOutput("This is the help message.");
+    } else {
+        WriteGameOutput("Command not recognized.");
+    }
 }
