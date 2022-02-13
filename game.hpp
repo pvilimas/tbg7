@@ -3,12 +3,25 @@
 
 #include "raylib.h"
 
+#include <iostream>
+
+#include "textbasedgame.hpp"
+#include "textbox.hpp"
+
 class Game {
     private:
+
+    TextBasedGame tbg;
+    TextBox textbox;
+    Texture2D roomImgTexture;
+
+    static constexpr int WinWidth = 640;
+    static constexpr int WinHeight = 460;
 
     public:
 
     Game();
+    ~Game();
 
     void Init();
     void Run();

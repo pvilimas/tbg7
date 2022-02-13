@@ -2,7 +2,8 @@ COMP = g++
 CFLAGS = -std=c++2a -Wall -Wextra -pedantic -O2 -mmacosx-version-min=11 -stdlib=libc++
 LFLAGS = -Iinclude/raylib/include -lraylib -Linclude/raylib \
 -framework iokit -framework Cocoa -framework OpenGL -lm
-SRC = main.cpp game.cpp
+SRC = main.cpp game.cpp textbasedgame.cpp \
+textbox.cpp
 PLATFORM = mac
 
 
@@ -13,7 +14,7 @@ main: $(SRC)
 	@cp -rf ./assets build/$(PLATFORM)/
 
 build: main
-	@printf "Compiling...\n"
+#	@printf "Compiling...\n"
 
 dist: clean build
 	@cp -rf ./assets dist/$(PLATFORM)/
@@ -28,6 +29,5 @@ clean:
 	@rm -rf build/mac/*.dSYM
 	@rm -f build/win/main
 	@rm -rf build/win/*.dSYM
-	@clear
 	@rm -rf dist/mac/*
 	@rm -rf dist/win/*

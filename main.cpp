@@ -1,5 +1,20 @@
-
 #include "game.hpp"
+
+/*
+    TODO:
+
+    - input cursor
+
+
+
+    - get back to where you were
+
+
+
+    GUIDELINES:
+
+    - do not use 'using namespace x' anywhere
+*/
 
 int main() {
 
