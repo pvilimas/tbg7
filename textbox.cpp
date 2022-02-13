@@ -7,6 +7,11 @@ TextBox::TextBox(std::function<void(std::string)> _onEnter) {
 }
 
 void TextBox::PollKeyInput() {
+
+    if (IsKeyPressed(KEY_ENTER)) {
+        onEnter(textIn);
+    }
+
     // Get char pressed (unicode character) on the queue
     int key = GetCharPressed();
 
@@ -24,7 +29,7 @@ void TextBox::PollKeyInput() {
             if (cursorPos > (PlayerPrompt + textIn).length()-1) {
                 cursorPos = (PlayerPrompt + textIn).length()-1;
             }
-        } if ((key >= 32) && (key <= 125)) {
+        } else if ((key >= 32) && (key <= 125)) {
             textIn.insert(textIn.begin() + cursorPos, (char)key);
             cursorPos++;
         }
