@@ -2,8 +2,8 @@ COMP = g++
 CFLAGS = -std=c++2a -Wall -Wextra -pedantic -O2 -mmacosx-version-min=11 -stdlib=libc++
 LFLAGS = -Iinclude/raylib/include -lraylib -Linclude/raylib \
 -framework iokit -framework Cocoa -framework OpenGL -lm
-SRC = main.cpp game.cpp textbasedgame.cpp \
-textbox.cpp
+SRC = main.cpp game.cpp textbox.cpp textbasedgame.cpp \
+command.cpp
 PLATFORM = mac
 
 

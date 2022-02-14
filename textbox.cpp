@@ -9,9 +9,11 @@ TextBox::TextBox(std::function<void(std::string)> _onEnter) {
 void TextBox::PollKeyInput() {
 
     if (IsKeyPressed(KEY_ENTER)) {
-        onEnter(textIn);
-        textIn.clear();
-        cursorPos = 0;
+        if (textIn.length() > 0) {
+            onEnter(textIn);
+            textIn.clear();
+            cursorPos = 0;
+        }
     } else if (IsKeyPressed(KEY_LEFT)) {
         cursorPos--;
         if (cursorPos < 0) {

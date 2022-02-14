@@ -46,7 +46,7 @@ class TextBasedGame {
     void EvalPlayerInput(std::string);
     std::function<void(std::string)> WriteGameOutput;
 
-    std::vector<Command&> GetCommands();
+    std::vector<Command> GetCommands();
     
 };
 

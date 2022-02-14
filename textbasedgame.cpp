@@ -22,11 +22,22 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
 }
 
 void TextBasedGame::EvalPlayerInput(std::string s) {
-    if (s == "quit") {
-        exit(0);
-    } else if (s == "help") {
-        WriteGameOutput("This is the help message.");
-    } else {
-        WriteGameOutput("Command not recognized.");
+    for (Command& c : GetCommands()) {
+        if (c.Eval(s)) {
+            break;
+        }
     }
+}
+
+std::vector<Command> TextBasedGame::GetCommands() {
+    std::vector<Command> cmds;
+    
+    // game commands
+    cmds.push_back(Command("Help", false, "", "help( me)?", [&]{ WriteGameOutput("This is the help message."); }));
+    cmds.push_back(Command("Quit Game", false, "", "(q(uit)?|exit)", [&]{ exit(0); }));
+
+    // failsafes
+    cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput("Command not recognized."); }));
+
+    return cmds;
 }
