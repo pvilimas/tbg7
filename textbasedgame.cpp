@@ -19,6 +19,8 @@ TextBasedGame::TextBasedGame() {
 
 TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
     WriteGameOutput = _writeFunc;
+    state = State::Title;
+    WriteGameOutput("You are on the title screen.");
 }
 
 void TextBasedGame::EvalPlayerInput(std::string s) {
@@ -35,9 +37,25 @@ std::vector<Command> TextBasedGame::GetCommands() {
     // game commands
     cmds.push_back(Command("Help", false, "", "help( me)?", [&]{ WriteGameOutput("This is the help message."); }));
     cmds.push_back(Command("Quit Game", false, "", "(q(uit)?|exit)", [&]{ exit(0); }));
+    if (state == State::Title) {
+        cmds.push_back(Command("Start Game", false, "", "start( game)?", [&]{ SetState(State::Gameplay); }));
+    }
 
     // failsafes
     cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput("Command not recognized."); }));
 
     return cmds;
+}
+
+void TextBasedGame::SetState(TextBasedGame::State newState) {
+    State oldState = state;
+
+    // if/else stuff here with newState vs oldState
+
+    // if starting the game
+    if (oldState == State::Title && newState == State::Gameplay) {
+        WriteGameOutput("You are now in the game.");
+    }
+
+    state = newState;
 }

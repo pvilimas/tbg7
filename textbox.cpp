@@ -57,7 +57,7 @@ void TextBox::Draw() {
     PollKeyInput();
 
     /* textbox */
-    DrawRectangleRec(rec, Color {20, 20, 20, 255});
+    DrawRectangleRec(rec, Color {5, 5, 5, 255});
 
     /* text */
     DrawText(textOut[0].c_str(), rec.x, rec.y, 20, Color {180, 180, 180, 255});
