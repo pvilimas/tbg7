@@ -55,7 +55,7 @@ void TextBox::PollKeyInput() {
     }
 
     if (IsKeyPressed(KEY_BACKSPACE)) {
-        if (textIn.length() > 0) {
+        if (textIn.length() > 0 && cursorPos > 0) {
             textIn.erase(cursorPos-1, 1);
             cursorPos--;
         }

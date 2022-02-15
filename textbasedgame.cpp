@@ -87,8 +87,7 @@ std::vector<Command> TextBasedGame::GetCommands() {
     // room commands
 
     if (state == State::Gameplay) {
-        // for debugging
-        cmds.push_back(Command("Get Current Room", false, "cr", "c(urrent)?( )?r(oom)?", [&]{ WriteGameOutput("You are in the " + player.currentRoom->GetName()); }));
+        cmds.push_back(Command("Get Current Room", false, "where am i", "where am i", [&]{ WriteGameOutput("You are in the " + player.currentRoom->GetName() + "."); }));
     }
 
     // failsafes
