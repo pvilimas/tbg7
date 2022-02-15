@@ -12,20 +12,20 @@ class Game {
 
     private:
 
-    TextBasedGame tbg;
-    TextBox textbox;
-    Texture2D roomImgTexture;
+        TextBasedGame tbg;
+        TextBox textbox;
+        Texture2D roomImgTexture;
 
-    static constexpr int WinWidth = 640;
-    static constexpr int WinHeight = 460;
+        static constexpr int WinWidth = 640;
+        static constexpr int WinHeight = 460;
 
     public:
 
-    Game();
-    ~Game();
+        Game();
+        ~Game();
 
-    void Init();
-    void Run();
+        void Init();
+        void Run();
 };
 
 #endif /* __GAME_HEADER__ */

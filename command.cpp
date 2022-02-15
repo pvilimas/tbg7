@@ -8,8 +8,8 @@ Command::Command(std::string _name, bool _hidden, std::string _repr, std::string
         repr = _name;
     }
     hidden = _hidden;
-    // ignore case by default
-    regex = std::regex(_pattern, std::regex_constants::ECMAScript | std::regex_constants::icase);
+    // ignore case by default, ignore leading and trailing whitespace
+    regex = std::regex("\\s*" + _pattern + "\\s*", std::regex_constants::ECMAScript | std::regex_constants::icase);
     onMatch = _onMatch;
 }
 

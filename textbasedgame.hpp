@@ -16,69 +16,78 @@ class Player {
     
     private:
 
-    Room *currentRoom;
+        Room *currentRoom;
+
+        std::vector<Item*> inventory;
     
     public:
 
-    Player();
+        Player();
 
-    Room *GetCurrentRoom();
-    void SetCurrentRoom(Room* r);
+        Room *GetCurrentRoom();
+        void SetCurrentRoom(Room* r);
 
-    void Move(Direction dir);
+        std::vector<Item*> GetInventory();
+        std::string ReprInventory();
+
+        bool HasItem(Item* i);
+        void TakeItem(Item* i);
+        void DropItem(Item* i);
+
+        void Move(Direction dir);
 };
 
 class TextBasedGame {
 
     public:
 
-    struct QuitGameException {};
+        struct QuitGameException {};
 
     private:
 
-    struct DirectionSet {
-        Direction North, East, South, West;
-    };
+        struct DirectionSet {
+            Direction North, East, South, West;
+        };
 
-    enum State {
-        Title = 0,
-        Gameplay,
-    };
+        enum State {
+            Title = 0,
+            Gameplay,
+        };
 
-    struct Messages {
-        static std::string
-            Title,
-            Help,
+        struct Messages {
+            static std::string
+                Title,
+                Help,
 
-            ErrorUnknownCmd;
-    };
+                ErrorUnknownCmd;
+        };
 
-    State state;
+        State state;
 
-    Player player;
-    std::unordered_map<std::string, std::shared_ptr<Room>> rooms;
-    std::unordered_map<std::string, std::shared_ptr<Item>> items;
-    std::unordered_map<std::string, std::shared_ptr<NPC>> npcs;
+        Player player;
+        std::unordered_map<std::string, std::shared_ptr<Room>> rooms;
+        std::unordered_map<std::string, std::shared_ptr<Item>> items;
+        std::unordered_map<std::string, std::shared_ptr<NPC>> npcs;
 
     public:
 
-    static DirectionSet Directions;
-    
-    TextBasedGame();
-    TextBasedGame(std::function<void(std::string)> _writeFunc);
+        static DirectionSet Directions;
+        
+        TextBasedGame();
+        TextBasedGame(std::function<void(std::string)> _writeFunc);
 
-    /* IO - keep these public */
-    void EvalPlayerInput(std::string);
-    std::function<void(std::string)> WriteGameOutput;
+        /* IO - keep these public */
+        void EvalPlayerInput(std::string);
+        std::function<void(std::string)> WriteGameOutput;
 
-    // returns a list of all currently valid commands
-    std::vector<Command> GetCommands();
+        // returns a list of all currently valid commands
+        std::vector<Command> GetCommands();
 
-    // contains initialization logic for each state
-    void SetState(State newState);
+        // contains initialization logic for each state
+        void SetState(State newState);
 
-    // contains failure check
-    void TryMove(Direction dir);
+        // contains failure check
+        void TryMove(Direction dir);
     
 };
 

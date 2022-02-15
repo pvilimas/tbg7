@@ -24,26 +24,26 @@ class Room {
 
     public:
 
-    // TODO: convert to functions
-    enum MessageType : unsigned long { OnEnter, OnLook, OnStay };
+        // TODO: convert to functions
+        enum MessageType : unsigned long { OnEnter, OnLook, OnStay };
 
     private:
 
-    std::string name;
-    std::unordered_map<MessageType, std::string> messages;
-    // TODO: replace with map
-    Room* paths[Direction::Count];
+        std::string name;
+        std::unordered_map<MessageType, std::string> messages;
+        // TODO: replace with map
+        Room* paths[Direction::Count];
 
     public:
 
-    Room(std::string _name, std::unordered_map<MessageType, std::string> _messages);
+        Room(std::string _name, std::unordered_map<MessageType, std::string> _messages);
 
-    std::string GetName();
-    std::string GetMessage(MessageType);
-    Room *GetPath(Direction dir);
-    void SetPath(Direction dir, Room *r);
+        std::string GetName();
+        std::string GetMessage(MessageType);
+        Room *GetPath(Direction dir);
+        void SetPath(Direction dir, Room *r);
 
-    void Link(Direction dir, Room& other, bool bothways = true);
+        void Link(Direction dir, Room& other, bool bothways = true);
 };
 
 #endif /* __ROOM_HEADER__ */

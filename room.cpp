@@ -34,6 +34,5 @@ void Room::Link(Direction dir, Room& other, bool bothways) {
     if (bothways) {
         other.SetPath(dir.reverse, this);
     }
-    
 }
 

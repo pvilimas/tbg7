@@ -11,31 +11,31 @@
 class TextBox {
     private:
 
-    static constexpr int LineCount = 3;
-    static constexpr int LineLength = 58;
-    static constexpr int FontSize = 20;
-    static constexpr char PlayerPrompt[] = "> ";
+        static constexpr int LineCount = 3;
+        static constexpr int LineLength = 58;
+        static constexpr int FontSize = 20;
+        static constexpr char PlayerPrompt[] = "> ";
 
-    std::string textOut[TextBox::LineCount];
-    std::string textIn;
-    size_t cursorPos; // index into textIn
+        std::string textOut[TextBox::LineCount];
+        std::string textIn;
+        size_t cursorPos; // index into textIn
 
-    Rectangle rec;
-    std::function<void(std::string)> onEnter; // must be bound to textbasedgame.ReadPlayerInput
+        Rectangle rec;
+        std::function<void(std::string)> onEnter; // must be bound to textbasedgame.ReadPlayerInput
 
-    std::queue<char> textQueue; // used to scroll text
-    bool purgeQueue; // should the game clear the queue asap?
+        std::queue<char> textQueue; // used to scroll text
+        bool purgeQueue; // should the game clear the queue asap?
 
-    void PollKeyInput();
+        void PollKeyInput();
     
     public:
 
-    TextBox(std::function<void(std::string)> _onEnter = nullptr);
+        TextBox(std::function<void(std::string)> _onEnter = nullptr);
 
-    // IO
-    void Write(std::string);
+        // IO
+        void Write(std::string);
 
-    void Draw();
+        void Draw();
 };
 
 #endif /* __TEXTBOX_HEADER__ */
