@@ -3,6 +3,13 @@
 /*
     TODO:
 
+    - implement items
+    - player inventory
+    - room items
+    - item attrs: can take
+
+    - use items - start with []{ WriteGameOutput("You used the " this.name); }
+    - item attrs: can use
 
     GUIDELINES:
 
