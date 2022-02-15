@@ -24,8 +24,12 @@ class Player {
 
 class TextBasedGame {
 
+    public:
+
+    struct QuitGameException {};
+
     private:
-    
+
     struct DirectionSet {
         Direction North, East, South, West;
     };

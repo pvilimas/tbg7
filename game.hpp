@@ -9,6 +9,7 @@
 #include "textbox.hpp"
 
 class Game {
+
     private:
 
     TextBasedGame tbg;

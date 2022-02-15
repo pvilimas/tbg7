@@ -22,6 +22,7 @@ class Room {
 
     public:
 
+    // TODO: convert to functions
     enum MessageType : unsigned long { OnEnter, OnLook, OnStay };
 
     private:

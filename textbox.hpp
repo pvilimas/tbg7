@@ -2,6 +2,7 @@
 #define __TEXTBOX_HEADER__
 
 #include <iostream>
+#include <queue>
 #include <string>
 
 #include "raylib.h"
@@ -21,8 +22,11 @@ class TextBox {
     Rectangle rec;
     std::function<void(std::string)> onEnter; // must be bound to textbasedgame.ReadPlayerInput
 
+    std::queue<char> textQueue; // used to scroll text
+    bool purgeQueue; // should the game clear the queue asap?
 
     void PollKeyInput();
+    
     public:
 
     TextBox(std::function<void(std::string)> _onEnter = nullptr);

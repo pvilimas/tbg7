@@ -71,7 +71,7 @@ std::vector<Command> TextBasedGame::GetCommands() {
     
     // game commands
     cmds.push_back(Command("Help", false, "help", "help( me)?", [&]{ WriteGameOutput("This is the help message."); }));
-    cmds.push_back(Command("Quit Game", false, "quit", "(q(uit)?|exit)", [&]{ exit(0); }));
+    cmds.push_back(Command("Quit Game", false, "quit", "(q(uit)?|exit)", [&]{ throw TextBasedGame::QuitGameException(); }));
 
     if (state == State::Title) {
         cmds.push_back(Command("Start Game", false, "start", "start( game)?", [&]{ SetState(State::Gameplay); }));

@@ -4,9 +4,18 @@ TextBox::TextBox(std::function<void(std::string)> _onEnter) {
     rec = Rectangle { 0, 360, 640, 100 };
     cursorPos = 0;
     onEnter = _onEnter;
+
+    purgeQueue = false;
 }
 
 void TextBox::PollKeyInput() {
+
+    if (!textQueue.empty()) {
+        if (GetKeyPressed() != 0) {
+            purgeQueue = true;
+        }
+        return;
+    }
 
     if (IsKeyPressed(KEY_ENTER)) {
         if (textIn.length() > 0) {
@@ -54,7 +63,27 @@ void TextBox::PollKeyInput() {
 }
 
 void TextBox::Draw() {
+    // which line text is being added to
+    static int _currLine = 0;
+    static char c;
+
     PollKeyInput();
+
+    /* update text queue */
+
+    if (!textQueue.empty()) {
+        do {
+            c = textQueue.front();
+            if (c == '\n') {
+                _currLine++;
+            }
+            textOut[_currLine] += c;
+            textQueue.pop();
+        } while (!textQueue.empty() && purgeQueue);
+        purgeQueue = false;
+    } else {
+        _currLine = 0;
+    }
 
     /* textbox */
     DrawRectangleRec(rec, Color {5, 5, 5, 255});
@@ -80,5 +109,12 @@ void TextBox::Draw() {
 }
 
 void TextBox::Write(std::string s) {
-    textOut[0] = s;
+    for (std::string& line : textOut) {
+        line.clear();
+    }
+    // clear queue
+    textQueue = std::queue<char>();
+    for (char c : s) {
+        textQueue.push(c);
+    }
 }

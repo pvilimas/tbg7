@@ -10,12 +10,15 @@
 */
 
 int main() {
-
     SetTraceLogLevel(LOG_WARNING);
     ChangeDirectory(GetApplicationDirectory());
 
     Game *g = new Game();
     g->Init();
-    g->Run();
+    try {
+        g->Run();
+    } catch (TextBasedGame::QuitGameException& q) {}
     delete g;
+
+    return 0;
 }
