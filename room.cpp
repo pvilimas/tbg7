@@ -1,6 +1,6 @@
 #include "room.hpp"
 
-Room::Room(std::string _name, std::string _messages[3]) {
+Room::Room(std::string _name, std::unordered_map<MessageType, std::string> _messages) {
     name = _name;
     // hardcoding :(
     // use std::array ( + ::fill)?
@@ -9,9 +9,7 @@ Room::Room(std::string _name, std::string _messages[3]) {
     paths[2] = nullptr;
     paths[3] = nullptr;
 
-    messages[0] = _messages[0];
-    messages[1] = _messages[1];
-    messages[2] = _messages[2];
+    messages = _messages;
 }
 
 std::string Room::GetName() {

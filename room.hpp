@@ -28,12 +28,13 @@ class Room {
     private:
 
     std::string name;
-    std::string messages[3];
+    std::unordered_map<MessageType, std::string> messages;
+    // TODO: replace with map
     Room* paths[Direction::Count];
 
     public:
 
-    Room(std::string _name, std::string _messages[3]);
+    Room(std::string _name, std::unordered_map<MessageType, std::string> _messages);
 
     std::string GetName();
     std::string GetMessage(MessageType);

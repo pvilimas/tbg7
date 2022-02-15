@@ -76,8 +76,9 @@ void TextBox::Draw() {
             c = textQueue.front();
             if (c == '\n') {
                 _currLine++;
+            } else {
+                textOut[_currLine] += c;
             }
-            textOut[_currLine] += c;
             textQueue.pop();
         } while (!textQueue.empty() && purgeQueue);
         purgeQueue = false;
@@ -89,9 +90,9 @@ void TextBox::Draw() {
     DrawRectangleRec(rec, Color {5, 5, 5, 255});
 
     /* text */
-    DrawText(textOut[0].c_str(), rec.x, rec.y, 20, Color {180, 180, 180, 255});
-    DrawText(textOut[1].c_str(), rec.x, rec.y+25, 20, Color {180, 180, 180, 255});
-    DrawText(textOut[2].c_str(), rec.x, rec.y+50, 20, Color {180, 180, 180, 255});
+    DrawText(textOut[0].c_str(), rec.x+2, rec.y, 20, Color {180, 180, 180, 255});
+    DrawText(textOut[1].c_str(), rec.x+2, rec.y+25, 20, Color {180, 180, 180, 255});
+    DrawText(textOut[2].c_str(), rec.x+2, rec.y+50, 20, Color {180, 180, 180, 255});
     DrawText((PlayerPrompt + textIn).c_str(), rec.x, rec.y+75, FontSize, WHITE);
 
     /* cursor */
@@ -109,12 +110,37 @@ void TextBox::Draw() {
 }
 
 void TextBox::Write(std::string s) {
+
     for (std::string& line : textOut) {
         line.clear();
     }
+
+    /* split text into lines */
+    static std::regex line_regex = std::regex("(.{1,58})(?:(\\s)+|$)");
+
+    std::queue<std::string> res;
+    int lc = 0;
+    for (std::sregex_iterator i = std::sregex_iterator(s.begin(), s.end(), line_regex); i != std::sregex_iterator(); i++) {
+        if (lc == TextBox::LineCount) {
+            break;
+        }
+        res.push((*i).str() + "\n");
+        lc++;
+    }
+
+    // pad it with empty lines
+    while (0 && res.size() < TextBox::LineCount) {
+        res.push("");
+    }
+
     // clear queue
     textQueue = std::queue<char>();
-    for (char c : s) {
-        textQueue.push(c);
+
+    while (!res.empty()) {
+        auto line = res.front();
+        for (char c : line) {
+            textQueue.push(c);
+        }
+        res.pop();
     }
 }

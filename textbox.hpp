@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <queue>
+#include <regex>
 #include <string>
 
 #include "raylib.h"
@@ -10,7 +11,7 @@
 class TextBox {
     private:
 
-    static constexpr int LineCount = 4;
+    static constexpr int LineCount = 3;
     static constexpr int LineLength = 58;
     static constexpr int FontSize = 20;
     static constexpr char PlayerPrompt[] = "> ";

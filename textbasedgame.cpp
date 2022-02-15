@@ -27,25 +27,24 @@ TextBasedGame::TextBasedGame() {
 TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
     state = State::Title;
     WriteGameOutput = _writeFunc;
-    WriteGameOutput("You are on the title screen.");
 
     // init rooms
 
     rooms = {
         {"Kitchen", std::make_shared<Room>(
             "Kitchen",
-            (std::string[]) {
-                [Room::MessageType::OnEnter] = "You have entered the kitchen.",
-                [Room::MessageType::OnLook] = "You are in the kitchen. A red key sits on the counter.",
-                [Room::MessageType::OnStay] = "You are in the kitchen.",
+            std::unordered_map<Room::MessageType, std::string> {
+                { Room::MessageType::OnEnter, "You have entered the kitchen." },
+                { Room::MessageType::OnLook, "You are in the kitchen. A red key sits on the counter." },
+                { Room::MessageType::OnStay, "You are in the kitchen." },
             }
         )},
         {"Bedroom", std::make_shared<Room>(
             "Bedroom",
-            (std::string[]) {
-                [Room::MessageType::OnEnter] = "You have entered the bedroom.",
-                [Room::MessageType::OnLook] = "You are in the bedroom. A red door is across from the bed.",
-                [Room::MessageType::OnStay] = "You are in the bedroom.",
+            std::unordered_map<Room::MessageType, std::string> {
+                { Room::MessageType::OnEnter, "You have entered the bedroom." },
+                { Room::MessageType::OnLook, "You are in the bedroom. A red key door is across from the bed." },
+                { Room::MessageType::OnStay, "You are in the bedroom." },
             }
         )},
     };
@@ -55,6 +54,9 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
     rooms.at("Kitchen")->Link(Directions.North, *rooms.at("Bedroom"));
 
     player.currentRoom = &*rooms.at("Kitchen");
+
+    //WriteGameOutput("You are on the title screen.");
+    WriteGameOutput("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
 
 }
 
@@ -87,6 +89,7 @@ std::vector<Command> TextBasedGame::GetCommands() {
     // room commands
 
     if (state == State::Gameplay) {
+        cmds.push_back(Command("Look Around", false, "look around", "look( around)?", [&]{ WriteGameOutput(player.currentRoom->GetMessage(Room::MessageType::OnLook)); }));
         cmds.push_back(Command("Get Current Room", false, "where am i", "where am i", [&]{ WriteGameOutput("You are in the " + player.currentRoom->GetName() + "."); }));
     }
 
@@ -103,7 +106,7 @@ void TextBasedGame::SetState(TextBasedGame::State newState) {
 
     // if starting the game
     if (oldState == State::Title && newState == State::Gameplay) {
-        WriteGameOutput("You are now in the game.");
+        WriteGameOutput(player.currentRoom->GetMessage(Room::MessageType::OnStay));
     }
 
     state = newState;

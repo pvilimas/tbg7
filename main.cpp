@@ -3,6 +3,8 @@
 /*
     TODO:
 
+    - text wrapping
+
     - implement items
     - player inventory
     - room items
