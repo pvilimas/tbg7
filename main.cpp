@@ -3,13 +3,6 @@
 /*
     TODO:
 
-    - input cursor
-
-
-
-    - get back to where you were
-
-
 
     GUIDELINES:
 

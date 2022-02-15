@@ -2,6 +2,7 @@
 #define __TBG_HEADER__
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -11,17 +12,14 @@
 #include "npc.hpp"
 #include "room.hpp"
 
-struct Direction {
-    std::string repr;
-    std::string abbr;
-    Direction& reverse;
-};
-
-
 class Player {
     public:
 
+    Room *currentRoom;
+
     Player();
+
+    void Move(Direction dir);
 };
 
 class TextBasedGame {
@@ -60,6 +58,9 @@ class TextBasedGame {
 
     // contains initialization logic for each state
     void SetState(State newState);
+
+    // contains failure check
+    void TryMove(Direction dir);
     
 };
 

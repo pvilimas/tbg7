@@ -3,7 +3,7 @@ CFLAGS = -std=c++2a -Wall -Wextra -pedantic -O2 -mmacosx-version-min=11 -stdlib=
 LFLAGS = -Iinclude/raylib/include -lraylib -Linclude/raylib \
 -framework iokit -framework Cocoa -framework OpenGL -lm
 SRC = main.cpp game.cpp textbox.cpp textbasedgame.cpp \
-command.cpp
+command.cpp room.cpp
 PLATFORM = mac
 
 
