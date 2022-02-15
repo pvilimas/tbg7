@@ -3,8 +3,6 @@
 /*
     TODO:
 
-    - text wrapping
-
     - implement items
     - player inventory
     - room items
@@ -12,6 +10,8 @@
 
     - use items - start with []{ WriteGameOutput("You used the " this.name); }
     - item attrs: can use
+
+    - quit confirmation (function)
 
     GUIDELINES:
 

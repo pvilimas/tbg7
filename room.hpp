@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "item.hpp"
+
 struct Direction {
 
     static constexpr size_t Count = 4;

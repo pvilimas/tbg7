@@ -6,12 +6,24 @@ Player::Player() {
     currentRoom = nullptr;
 }
 
+Room *Player::GetCurrentRoom() {
+    return currentRoom;
+}
+
+void Player::SetCurrentRoom(Room* r) {
+    currentRoom = r;
+}
+
 // no failure check
 void Player::Move(Direction dir) {
     currentRoom = currentRoom->GetPath(dir);
 }
 
 /* ------- TEXTBASEDGAME ------- */
+
+std::string TextBasedGame::Messages::Title = "You are on the title screen.";
+std::string TextBasedGame::Messages::Help = "This is the help message.";
+std::string TextBasedGame::Messages::ErrorUnknownCmd = "Command not recognized.";
 
 TextBasedGame::DirectionSet TextBasedGame::Directions = {
     .North = Direction { .id = 0, .repr = "north", .abbr = "n", .reverse = TextBasedGame::Directions.South },
@@ -53,10 +65,9 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
 
     rooms.at("Kitchen")->Link(Directions.North, *rooms.at("Bedroom"));
 
-    player.currentRoom = &*rooms.at("Kitchen");
+    player.SetCurrentRoom(&*rooms.at("Kitchen"));
 
-    //WriteGameOutput("You are on the title screen.");
-    WriteGameOutput("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+    WriteGameOutput(TextBasedGame::Messages::Title);
 
 }
 
@@ -72,7 +83,7 @@ std::vector<Command> TextBasedGame::GetCommands() {
     std::vector<Command> cmds;
     
     // game commands
-    cmds.push_back(Command("Help", false, "help", "help( me)?", [&]{ WriteGameOutput("This is the help message."); }));
+    cmds.push_back(Command("Help", false, "help", "help( me)?", [&]{ WriteGameOutput(TextBasedGame::Messages::Help); }));
     cmds.push_back(Command("Quit Game", false, "quit", "(q(uit)?|exit)", [&]{ throw TextBasedGame::QuitGameException(); }));
 
     if (state == State::Title) {
@@ -89,12 +100,12 @@ std::vector<Command> TextBasedGame::GetCommands() {
     // room commands
 
     if (state == State::Gameplay) {
-        cmds.push_back(Command("Look Around", false, "look around", "look( around)?", [&]{ WriteGameOutput(player.currentRoom->GetMessage(Room::MessageType::OnLook)); }));
-        cmds.push_back(Command("Get Current Room", false, "where am i", "where am i", [&]{ WriteGameOutput("You are in the " + player.currentRoom->GetName() + "."); }));
+        cmds.push_back(Command("Look Around", false, "look around", "look( around)?", [&]{ WriteGameOutput(player.GetCurrentRoom()->GetMessage(Room::MessageType::OnLook)); }));
+        cmds.push_back(Command("Get Current Room", false, "where am i", "where am i", [&]{ WriteGameOutput("You are in the " + player.GetCurrentRoom()->GetName() + "."); }));
     }
 
     // failsafes
-    cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput("Command not recognized."); }));
+    cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownCmd); }));
 
     return cmds;
 }
@@ -106,16 +117,16 @@ void TextBasedGame::SetState(TextBasedGame::State newState) {
 
     // if starting the game
     if (oldState == State::Title && newState == State::Gameplay) {
-        WriteGameOutput(player.currentRoom->GetMessage(Room::MessageType::OnStay));
+        WriteGameOutput(player.GetCurrentRoom()->GetMessage(Room::MessageType::OnStay));
     }
 
     state = newState;
 }
 
 void TextBasedGame::TryMove(Direction dir) {
-    if (player.currentRoom->GetPath(dir) != nullptr) {
+    if (player.GetCurrentRoom()->GetPath(dir) != nullptr) {
         player.Move(dir);
-        WriteGameOutput(player.currentRoom->GetMessage(Room::MessageType::OnEnter));
+        WriteGameOutput(player.GetCurrentRoom()->GetMessage(Room::MessageType::OnEnter));
     } else {
         WriteGameOutput("You can't go that way.");
     }

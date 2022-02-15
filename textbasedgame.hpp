@@ -13,11 +13,17 @@
 #include "room.hpp"
 
 class Player {
-    public:
+    
+    private:
 
     Room *currentRoom;
+    
+    public:
 
     Player();
+
+    Room *GetCurrentRoom();
+    void SetCurrentRoom(Room* r);
 
     void Move(Direction dir);
 };
@@ -37,6 +43,14 @@ class TextBasedGame {
     enum State {
         Title = 0,
         Gameplay,
+    };
+
+    struct Messages {
+        static std::string
+            Title,
+            Help,
+
+            ErrorUnknownCmd;
     };
 
     State state;
