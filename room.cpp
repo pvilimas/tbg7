@@ -1,6 +1,6 @@
 #include "room.hpp"
 
-Room::Room(std::string _name) {
+Room::Room(std::string _name, std::string _messages[3]) {
     name = _name;
     // hardcoding :(
     // use std::array ( + ::fill)?
@@ -8,10 +8,18 @@ Room::Room(std::string _name) {
     paths[1] = nullptr;
     paths[2] = nullptr;
     paths[3] = nullptr;
+
+    messages[0] = _messages[0];
+    messages[1] = _messages[1];
+    messages[2] = _messages[2];
 }
 
 std::string Room::GetName() {
     return name;
+}
+
+std::string Room::GetMessage(MessageType m) {
+    return messages[m];
 }
 
 Room *Room::GetPath(Direction dir) {

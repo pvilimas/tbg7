@@ -32,8 +32,22 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
     // init rooms
 
     rooms = {
-        {"Kitchen", std::make_shared<Room>("Kitchen")},
-        {"Bedroom", std::make_shared<Room>("Bedroom")},
+        {"Kitchen", std::make_shared<Room>(
+            "Kitchen",
+            (std::string[]) {
+                [Room::MessageType::OnEnter] = "You have entered the kitchen.",
+                [Room::MessageType::OnLook] = "You are in the kitchen. A red key sits on the counter.",
+                [Room::MessageType::OnStay] = "You are in the kitchen.",
+            }
+        )},
+        {"Bedroom", std::make_shared<Room>(
+            "Bedroom",
+            (std::string[]) {
+                [Room::MessageType::OnEnter] = "You have entered the bedroom.",
+                [Room::MessageType::OnLook] = "You are in the bedroom. A red door is across from the bed.",
+                [Room::MessageType::OnStay] = "You are in the bedroom.",
+            }
+        )},
     };
 
     // link rooms
@@ -56,24 +70,25 @@ std::vector<Command> TextBasedGame::GetCommands() {
     std::vector<Command> cmds;
     
     // game commands
-    cmds.push_back(Command("Help", false, "", "help( me)?", [&]{ WriteGameOutput("This is the help message."); }));
-    cmds.push_back(Command("Quit Game", false, "", "(q(uit)?|exit)", [&]{ exit(0); }));
+    cmds.push_back(Command("Help", false, "help", "help( me)?", [&]{ WriteGameOutput("This is the help message."); }));
+    cmds.push_back(Command("Quit Game", false, "quit", "(q(uit)?|exit)", [&]{ exit(0); }));
 
     if (state == State::Title) {
-        cmds.push_back(Command("Start Game", false, "", "start( game)?", [&]{ SetState(State::Gameplay); }));
+        cmds.push_back(Command("Start Game", false, "start", "start( game)?", [&]{ SetState(State::Gameplay); }));
     }
 
     if (state == State::Gameplay) {
-        cmds.push_back(Command("Go North", false, "", "((go|move) )?n(orth)?", [&] { TryMove(Directions.North); }));
-        cmds.push_back(Command("Go South", false, "", "((go|move) )?s(outh)?", [&] { TryMove(Directions.South); }));
-        cmds.push_back(Command("Go East", false, "", "((go|move) )?e(ast)?", [&] { TryMove(Directions.East); }));
-        cmds.push_back(Command("Go West", false, "", "((go|move) )?w(est)?", [&] { TryMove(Directions.West); }));
+        cmds.push_back(Command("Go North", false, "north", "((go|move) )?n(orth)?", [&] { TryMove(Directions.North); }));
+        cmds.push_back(Command("Go South", false, "south", "((go|move) )?s(outh)?", [&] { TryMove(Directions.South); }));
+        cmds.push_back(Command("Go East", false, "east", "((go|move) )?e(ast)?", [&] { TryMove(Directions.East); }));
+        cmds.push_back(Command("Go West", false, "west", "((go|move) )?w(est)?", [&] { TryMove(Directions.West); }));
     }
 
     // room commands
 
     if (state == State::Gameplay) {
-        cmds.push_back(Command("Get Current Room", false, "", "c(urrent)?( )?r(oom)?", [&]{ WriteGameOutput("You are in the " + player.currentRoom->GetName()); }));
+        // for debugging
+        cmds.push_back(Command("Get Current Room", false, "cr", "c(urrent)?( )?r(oom)?", [&]{ WriteGameOutput("You are in the " + player.currentRoom->GetName()); }));
     }
 
     // failsafes
@@ -98,6 +113,7 @@ void TextBasedGame::SetState(TextBasedGame::State newState) {
 void TextBasedGame::TryMove(Direction dir) {
     if (player.currentRoom->GetPath(dir) != nullptr) {
         player.Move(dir);
+        WriteGameOutput(player.currentRoom->GetMessage(Room::MessageType::OnEnter));
     } else {
         WriteGameOutput("You can't go that way.");
     }

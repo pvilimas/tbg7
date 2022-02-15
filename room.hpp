@@ -20,17 +20,22 @@ struct Direction {
 
 class Room {
 
+    public:
+
+    enum MessageType : unsigned long { OnEnter, OnLook, OnStay };
+
     private:
 
     std::string name;
+    std::string messages[3];
     Room* paths[Direction::Count];
 
     public:
 
-    Room(std::string _name);
+    Room(std::string _name, std::string _messages[3]);
 
     std::string GetName();
-    
+    std::string GetMessage(MessageType);
     Room *GetPath(Direction dir);
     void SetPath(Direction dir, Room *r);
 
