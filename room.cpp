@@ -28,6 +28,31 @@ void Room::SetPath(Direction dir, Room *r) {
     paths[dir.id] = r;
 }
 
+bool Room::HasItem(Item* i) {
+    for (Item const *_i : items) {
+        if (i == _i) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Room::AddItem(Item* i) {
+    items.push_back(i);
+}
+
+void Room::RemoveItem(Item* i) {
+    int count = 0;
+    for (auto& _i : items) {
+        if (i == _i) {
+            items.erase(items.begin()+count);
+            return;
+        }
+        count++;
+    }
+}
+
+
 void Room::Link(Direction dir, Room& other, bool bothways) {
     SetPath(dir, &other);
     

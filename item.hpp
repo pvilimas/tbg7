@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "command.hpp"
+
 class Item {
 
     private:

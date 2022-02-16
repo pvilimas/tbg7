@@ -3,15 +3,27 @@
 /*
     TODO:
 
-    - implement items
-    - player inventory
-    - room items
     - item attrs: can take
 
     - use items - start with []{ WriteGameOutput("You used the " this.name); }
     - item attrs: can use
 
-    - quit confirmation (function)
+    - quit confirmation - gamestate for this, only commands it takes are y(es)?, n(o)?, and "sorry i don't understand"
+
+    - regex collect
+        # allows you to pass in a list of regex strings and joins them into one string (inefficiently - can be a long string)
+        # ex. ['what\'s up', 'how are you doing', ...] -> r'(what\'s up)|(how are you doing)|...'
+        def collect(*options: List[str]) -> RegexStr:
+
+            """
+            allows you to pass in a list of regex strings and joins them into one string (inefficiently - can be a long string).
+            
+            ex. ['what\'s up', 'how are you doing', ...] -> r'(what\'s up)|(how are you doing)|...'
+            
+            Used in the DialogOption and Command classes.
+            """
+
+            return '(' + ('|'.join([f'({o})' for o in options])) + ')'
 
     GUIDELINES:
 

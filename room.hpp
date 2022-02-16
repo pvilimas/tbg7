@@ -34,14 +34,21 @@ class Room {
         // TODO: replace with map
         Room* paths[Direction::Count];
 
+        std::vector<Item*> items;
+
     public:
 
         Room(std::string _name, std::unordered_map<MessageType, std::string> _messages);
 
         std::string GetName();
         std::string GetMessage(MessageType);
+
         Room *GetPath(Direction dir);
         void SetPath(Direction dir, Room *r);
+
+        bool HasItem(Item* i);
+        void AddItem(Item* i);
+        void RemoveItem(Item* i);
 
         void Link(Direction dir, Room& other, bool bothways = true);
 };

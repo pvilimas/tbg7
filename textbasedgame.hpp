@@ -58,7 +58,14 @@ class TextBasedGame {
             static std::string
                 Title,
                 Help,
-
+                ErrorInvalidTake,
+                ErrorInvalidTakeMissing,
+                ErrorInvalidUse,
+                ErrorInvalidDrop,
+                ErrorMissingTake,
+                ErrorMissingUse,
+                ErrorMissingDrop,
+                ErrorUnknownItem,
                 ErrorUnknownCmd;
         };
 
@@ -88,6 +95,11 @@ class TextBasedGame {
 
         // contains failure check
         void TryMove(Direction dir);
+
+        // contains failure check
+        void TryTakeItem(Item* i);
+        // contains failure check
+        void TryDropItem(Item* i);
     
 };
 

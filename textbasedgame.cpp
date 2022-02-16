@@ -18,21 +18,28 @@ std::vector<Item*> Player::GetInventory() {
     return inventory;
 }
 
+inline std::string fullRepr(std::string itemRepr) {
+    return (itemRepr[0] == 'a' || itemRepr[0] == 'e' || itemRepr[0] == 'i' || itemRepr[0] == 'o' || itemRepr[0] == 'u')
+        ? "an " + itemRepr
+        : "a " + itemRepr;
+}
+
 std::string Player::ReprInventory() {
+
     std::string s = "Your inventory contains ";
     switch (inventory.size()) {
         case 0: return "Your inventory is empty.";
-        case 1: return s + inventory.at(0)->GetRepr() + ".";
-        case 2: return s + inventory.at(0)->GetRepr() + " and "  + inventory.at(1)->GetRepr() + ".";
-        case 3: return s + inventory.at(0)->GetRepr() + ", "     + inventory.at(1)->GetRepr() + ", and " + inventory.at(2)->GetRepr() + ".";
+        case 1: return s + fullRepr(inventory.at(0)->GetRepr()) + ".";
+        case 2: return s + fullRepr(inventory.at(0)->GetRepr()) + " and "  + fullRepr(inventory.at(1)->GetRepr()) + ".";
+        case 3: return s + fullRepr(inventory.at(0)->GetRepr()) + ", "     + fullRepr(inventory.at(1)->GetRepr()) + ", and " + fullRepr(inventory.at(2)->GetRepr()) + ".";
         default: {
             size_t i; // scope issue, declare here
             for (i = 0; i < inventory.size() - 1; i++) {
-                s += inventory.at(i)->GetRepr();
+                s += fullRepr(inventory.at(i)->GetRepr());
                 s += ", ";
             }
             s += "and ";
-            s += inventory.at(i)->GetRepr();
+            s += fullRepr(inventory.at(i)->GetRepr());
             s += ".";
             return s;
         }
@@ -73,6 +80,30 @@ void Player::Move(Direction dir) {
 
 std::string TextBasedGame::Messages::Title = "You are on the title screen.";
 std::string TextBasedGame::Messages::Help = "This is the help message.";
+// TODO: functions here, to copy the exact verb the player used, unless it's invalid, in which case "what do you want to do?"
+//                                   ^ eg. "what do you want to pick up?"
+// maybe look at STR_KEYWORDS from tbg5/alpha/globals to get an idea
+// "take key" -> "take key"
+std::string TextBasedGame::Messages::ErrorInvalidTake = "You're already carrying that!";
+// "take <item not in curr room>"
+std::string TextBasedGame::Messages::ErrorInvalidTakeMissing = "I don't see that in here.";
+// "use <unusable item>"
+std::string TextBasedGame::Messages::ErrorInvalidUse = "You can't use that.";
+// "drop key" -> "drop key"
+std::string TextBasedGame::Messages::ErrorInvalidDrop = "You're not carrying that.";
+// "take"
+std::string TextBasedGame::Messages::ErrorMissingTake = "What do you want to take?";
+// "use"
+std::string TextBasedGame::Messages::ErrorMissingUse = "What do you want to use?";
+// "drop"
+std::string TextBasedGame::Messages::ErrorMissingDrop = "What do you want to drop?";
+/*
+    "use the sajdkadlas"
+    "take sjdalskdad"
+    "drop asdhjasfdjasme"
+*/
+std::string TextBasedGame::Messages::ErrorUnknownItem = "Item not found.";
+// "sajkdhasd"
 std::string TextBasedGame::Messages::ErrorUnknownCmd = "Command not recognized.";
 
 TextBasedGame::DirectionSet TextBasedGame::Directions = {
@@ -119,10 +150,10 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
 
     items = {
         {"Red Key", std::make_shared<Item>(
-            "Red Key", "a red key"
+            "Red Key", "red key"
         )},
         {"Red Door", std::make_shared<Item>(
-            "Red Door", "a red door"
+            "Red Door", "red door"
         )},
     };
 
@@ -165,18 +196,34 @@ std::vector<Command> TextBasedGame::GetCommands() {
     /* other top level actions */
     if (state == State::Gameplay) {
         cmds.push_back(Command("Look Around", false, "look around", "look( around)?", [&]{ WriteGameOutput(player.GetCurrentRoom()->GetMessage(Room::MessageType::OnLook)); }));
+        // TODO: boost::format?
         cmds.push_back(Command("Get Current Room", false, "where am i", "where am i", [&]{ WriteGameOutput("You are in the " + player.GetCurrentRoom()->GetName() + "."); }));
         cmds.push_back(Command("Check Inventory", false, "check inventory", "(check )?inv(entory)?", [&]{ WriteGameOutput(player.ReprInventory()); }));
     }
 
     // room commands
 
-
     // item commands
+    if (state == State::Gameplay) {
+        for (auto& it : items) {
+            auto name = it.first;
+            auto item = it.second;
+            cmds.push_back(Command("Take" + name, false, "", "take " + name, [&]{ TryTakeItem(&*item); }));
+            cmds.push_back(Command("Use" + name, false, "", "use " + name, [&]{ WriteGameOutput("You used the " + item->GetRepr() + "."); }));
+            cmds.push_back(Command("Drop" + name, false, "", "drop " + name, [&]{ TryDropItem(&*item); }));
+        }
+    }
+
 
     // npc commands
 
     // failsafes
+    if (state == State::Gameplay) {
+        cmds.push_back(Command("Failsafe: Take/Drop/Use Invalid Item", true, "", "(take|drop|use) .*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownItem); }));
+        cmds.push_back(Command("Failsafe: Missing Take", true, "", "take", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorMissingTake); }));
+        cmds.push_back(Command("Failsafe: Missing Drop", true, "", "drop", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorMissingDrop); }));
+        cmds.push_back(Command("Failsafe: Missing Use", true, "", "use", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorMissingUse); }));
+    }
     cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownCmd); }));
 
     return cmds;
@@ -201,5 +248,27 @@ void TextBasedGame::TryMove(Direction dir) {
         WriteGameOutput(player.GetCurrentRoom()->GetMessage(Room::MessageType::OnEnter));
     } else {
         WriteGameOutput("You can't go that way.");
+    }
+}
+
+void TextBasedGame::TryTakeItem(Item* i) {
+    if (player.HasItem(i)) {
+        WriteGameOutput(TextBasedGame::Messages::ErrorInvalidTake);
+    } else if (!player.GetCurrentRoom()->HasItem(i)) {
+        WriteGameOutput(TextBasedGame::Messages::ErrorInvalidTakeMissing);
+    } else {
+        player.TakeItem(i);
+        player.GetCurrentRoom()->RemoveItem(i);
+        WriteGameOutput("You picked up the " + i->GetRepr() + ".");
+    }
+}
+
+void TextBasedGame::TryDropItem(Item* i) {
+    if (!player.HasItem(i)) {
+        WriteGameOutput(TextBasedGame::Messages::ErrorInvalidDrop);
+    } else {
+        player.DropItem(i);
+        player.GetCurrentRoom()->AddItem(i);
+        WriteGameOutput("You dropped the " + i->GetRepr() + ".");
     }
 }
