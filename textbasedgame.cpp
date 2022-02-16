@@ -128,8 +128,6 @@ TextBasedGame::TextBasedGame() {
 TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
     state = State::Title;
     WriteGameOutput = _writeFunc;
-    // static method, used to init item and room commands
-    std::function<void(std::string)> WriteToGame = _writeFunc;
 
     // init rooms
 
@@ -164,10 +162,12 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
 
     items = {
         {"Red Key", std::make_shared<Item>(
-            "Red Key", "red key"
+            "Red Key", "red key", std::vector<Command>{}
         )},
         {"Red Door", std::make_shared<Item>(
-            "Red Door", "red door"
+            "Red Door", "red door", std::vector<Command>{
+                Command("Red Door: Open", false, "", "open (red )?door", [*this]{ WriteGameOutput("You opened the red door."); })
+            }
         )},
     };
 
@@ -219,6 +219,7 @@ std::vector<Command> TextBasedGame::GetCommands() {
 
     // room commands
 
+    // special room cmds
     if (state == State::Gameplay) {
         for (Command c : player.GetCurrentRoom()->GetCommands()) {
             cmds.push_back(c);
@@ -230,9 +231,16 @@ std::vector<Command> TextBasedGame::GetCommands() {
         for (auto& it : items) {
             auto name = it.first;
             auto item = it.second;
+
+            // standard item cmds
             cmds.push_back(Command("Take" + name, false, "", "take " + name, [&]{ TryTakeItem(&*item); }));
             cmds.push_back(Command("Use" + name, false, "", "use " + name, [&]{ WriteGameOutput("You used the " + item->GetRepr() + "."); }));
             cmds.push_back(Command("Drop" + name, false, "", "drop " + name, [&]{ TryDropItem(&*item); }));
+
+            // special item cmds
+            for (Command c : item->GetCommands()) {
+                cmds.push_back(c);
+            }
         }
     }
 

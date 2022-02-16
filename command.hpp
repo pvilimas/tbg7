@@ -4,8 +4,6 @@
 #include <string>
 #include <regex>
 
-extern std::function<void(std::string)> WriteToGame;
-
 class Command {
     
     private:

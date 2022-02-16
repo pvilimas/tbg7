@@ -15,7 +15,7 @@ class Item {
         
     public:
 
-        Item(std::string _name, std::string _repr);
+        Item(std::string _name, std::string _repr, std::vector<Command> _commands);
 
         std::string GetName();
         std::string GetRepr();
