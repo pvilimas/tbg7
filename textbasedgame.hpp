@@ -50,14 +50,16 @@ class TextBasedGame {
         };
 
         enum State {
-            Title = 0,
+            Title,
             Gameplay,
+            Quitting,
         };
 
         struct Messages {
             static std::string
                 Title,
                 Help,
+                PromptQuit,
                 ErrorInvalidTake,
                 ErrorInvalidTakeMissing,
                 ErrorInvalidUse,
@@ -66,10 +68,12 @@ class TextBasedGame {
                 ErrorMissingUse,
                 ErrorMissingDrop,
                 ErrorUnknownItem,
-                ErrorUnknownCmd;
+                ErrorUnknownCmd,
+                ErrorUnknownQuitCmd;
         };
 
         State state;
+        State preQuitState; // state prior to quit conf - gameplay or title
 
         Player player;
         std::unordered_map<std::string, std::shared_ptr<Room>> rooms;

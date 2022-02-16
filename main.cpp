@@ -2,11 +2,12 @@
 
 /*
     TODO:
+    
+    - quit conf
 
-    - item attrs: can take
+    - item attrs: can take, can use, can use without picking up
 
     - use items - start with []{ WriteGameOutput("You used the " this.name); }
-    - item attrs: can use
 
     - quit confirmation - gamestate for this, only commands it takes are y(es)?, n(o)?, and "sorry i don't understand"
 

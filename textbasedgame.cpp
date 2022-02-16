@@ -80,6 +80,8 @@ void Player::Move(Direction dir) {
 
 std::string TextBasedGame::Messages::Title = "You are on the title screen.";
 std::string TextBasedGame::Messages::Help = "This is the help message.";
+std::string TextBasedGame::Messages::PromptQuit = "Do you want to quit? (y/n)";
+
 // TODO: functions here, to copy the exact verb the player used, unless it's invalid, in which case "what do you want to do?"
 //                                   ^ eg. "what do you want to pick up?"
 // maybe look at STR_KEYWORDS from tbg5/alpha/globals to get an idea
@@ -105,6 +107,8 @@ std::string TextBasedGame::Messages::ErrorMissingDrop = "What do you want to dro
 std::string TextBasedGame::Messages::ErrorUnknownItem = "Item not found.";
 // "sajkdhasd"
 std::string TextBasedGame::Messages::ErrorUnknownCmd = "Command not recognized.";
+// same as above but for the quit conf
+std::string TextBasedGame::Messages::ErrorUnknownQuitCmd = "Command not recognized. Do you want to quit? (y/n)";
 
 TextBasedGame::DirectionSet TextBasedGame::Directions = {
     .North = Direction { .id = 0, .repr = "north", .abbr = "n", .reverse = TextBasedGame::Directions.South },
@@ -178,8 +182,10 @@ std::vector<Command> TextBasedGame::GetCommands() {
     std::vector<Command> cmds;
     
     /* game commands */
-    cmds.push_back(Command("Help", false, "help", "help( me)?", [&]{ WriteGameOutput(TextBasedGame::Messages::Help); }));
-    cmds.push_back(Command("Quit Game", false, "quit", "(q(uit)?|exit)", [&]{ throw TextBasedGame::QuitGameException(); }));
+    if (state == State::Title || state == State::Gameplay) {
+        cmds.push_back(Command("Help", false, "help", "help( me)?", [&]{ WriteGameOutput(TextBasedGame::Messages::Help); }));
+        cmds.push_back(Command("Quit Game", false, "quit", "(q(uit)?|exit)", [&]{ SetState(TextBasedGame::State::Quitting); }));
+    }
 
     if (state == State::Title) {
         cmds.push_back(Command("Start Game", false, "start", "start( game)?", [&]{ SetState(State::Gameplay); }));
@@ -224,7 +230,16 @@ std::vector<Command> TextBasedGame::GetCommands() {
         cmds.push_back(Command("Failsafe: Missing Drop", true, "", "drop", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorMissingDrop); }));
         cmds.push_back(Command("Failsafe: Missing Use", true, "", "use", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorMissingUse); }));
     }
-    cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownCmd); }));
+    
+    // quit conf
+    if (state == State::Quitting) {
+        cmds.push_back(Command("Quit Confirmation: Yes", true, "", "y(es)?", [&]{ throw TextBasedGame::QuitGameException(); }));
+        cmds.push_back(Command("Quit Confirmation: No", true, "", "n(o)?", [&]{ SetState(preQuitState); }));
+        cmds.push_back(Command("Quit Confirmation: Unknown", true, "", ".*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownQuitCmd); }));
+    } else {
+        cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownQuitCmd); }));
+    }
+    
 
     return cmds;
 }
@@ -232,11 +247,28 @@ std::vector<Command> TextBasedGame::GetCommands() {
 void TextBasedGame::SetState(TextBasedGame::State newState) {
     State oldState = state;
 
+    if (oldState == newState) {
+        return;
+    }
+
     // if/else stuff here with newState vs oldState
 
-    // if starting the game
+    // if starting the game, write startup message
     if (oldState == State::Title && newState == State::Gameplay) {
         WriteGameOutput(player.GetCurrentRoom()->GetMessage(Room::MessageType::OnStay));
+    }
+    // if going to quit screen, save previous state to return
+    else if (newState == State::Quitting) {
+        preQuitState = oldState;
+        WriteGameOutput(TextBasedGame::Messages::PromptQuit);
+    }
+    // if returning from quit conf
+    else if (oldState == State::Quitting) {
+        if (newState == State::Title) {
+            WriteGameOutput(TextBasedGame::Messages::Title);
+        } else if (newState == State::Gameplay) {
+            WriteGameOutput(player.GetCurrentRoom()->GetMessage(Room::MessageType::OnStay));
+        }
     }
 
     state = newState;
