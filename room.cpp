@@ -1,6 +1,6 @@
 #include "room.hpp"
 
-Room::Room(std::string _name, std::unordered_map<MessageType, std::string> _messages) {
+Room::Room(std::string _name, std::unordered_map<MessageType, std::string> _messages, std::vector<Command> _commands) {
     name = _name;
     // hardcoding :(
     // use std::array ( + ::fill)?
@@ -10,6 +10,7 @@ Room::Room(std::string _name, std::unordered_map<MessageType, std::string> _mess
     paths[3] = nullptr;
 
     messages = _messages;
+    commands = _commands;
 }
 
 std::string Room::GetName() {
@@ -61,3 +62,6 @@ void Room::Link(Direction dir, Room& other, bool bothways) {
     }
 }
 
+std::vector<Command> Room::GetCommands() {
+    return commands;
+}

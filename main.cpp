@@ -2,14 +2,10 @@
 
 /*
     TODO:
-    
-    - quit conf
+
+    - paginate output ("...", hit enter to see next page)
 
     - item attrs: can take, can use, can use without picking up
-
-    - use items - start with []{ WriteGameOutput("You used the " this.name); }
-
-    - quit confirmation - gamestate for this, only commands it takes are y(es)?, n(o)?, and "sorry i don't understand"
 
     - regex collect
         # allows you to pass in a list of regex strings and joins them into one string (inefficiently - can be a long string)

@@ -18,7 +18,7 @@ std::vector<Item*> Player::GetInventory() {
     return inventory;
 }
 
-inline std::string fullRepr(std::string itemRepr) {
+inline std::string Player::fullRepr(std::string itemRepr) {
     return (itemRepr[0] == 'a' || itemRepr[0] == 'e' || itemRepr[0] == 'i' || itemRepr[0] == 'o' || itemRepr[0] == 'u')
         ? "an " + itemRepr
         : "a " + itemRepr;
@@ -78,6 +78,8 @@ void Player::Move(Direction dir) {
 
 /* ------- TEXTBASEDGAME ------- */
 
+/* static stuff */
+
 std::string TextBasedGame::Messages::Title = "You are on the title screen.";
 std::string TextBasedGame::Messages::Help = "This is the help message.";
 std::string TextBasedGame::Messages::PromptQuit = "Do you want to quit? (y/n)";
@@ -117,6 +119,8 @@ TextBasedGame::DirectionSet TextBasedGame::Directions = {
     .West = Direction { .id = 3, .repr = "west", .abbr = "w", .reverse = TextBasedGame::Directions.East },
 };
 
+/* instance stuff */
+
 TextBasedGame::TextBasedGame() {
     WriteGameOutput = nullptr;
 }
@@ -124,6 +128,8 @@ TextBasedGame::TextBasedGame() {
 TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
     state = State::Title;
     WriteGameOutput = _writeFunc;
+    // static method, used to init item and room commands
+    std::function<void(std::string)> WriteToGame = _writeFunc;
 
     // init rooms
 
@@ -134,7 +140,8 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
                 { Room::MessageType::OnEnter, "You have entered the kitchen." },
                 { Room::MessageType::OnLook, "You are in the kitchen. A red key sits on the counter." },
                 { Room::MessageType::OnStay, "You are in the kitchen." },
-            }
+            },
+            std::vector<Command>{}
         )},
         { "Bedroom", std::make_shared<Room>(
             "Bedroom",
@@ -142,6 +149,9 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
                 { Room::MessageType::OnEnter, "You have entered the bedroom." },
                 { Room::MessageType::OnLook, "You are in the bedroom. A red key door is across from the bed." },
                 { Room::MessageType::OnStay, "You are in the bedroom." },
+            },
+            std::vector<Command> {
+                Command("Bedroom: Sleep", false, "sleep in bed", "sleep(in (the )?bed)?", [*this]{ WriteGameOutput("You slept in the bed. You woke up feeling refreshed."); })
             }
         )},
     };
@@ -209,6 +219,12 @@ std::vector<Command> TextBasedGame::GetCommands() {
 
     // room commands
 
+    if (state == State::Gameplay) {
+        for (Command c : player.GetCurrentRoom()->GetCommands()) {
+            cmds.push_back(c);
+        }
+    }
+
     // item commands
     if (state == State::Gameplay) {
         for (auto& it : items) {
@@ -237,7 +253,7 @@ std::vector<Command> TextBasedGame::GetCommands() {
         cmds.push_back(Command("Quit Confirmation: No", true, "", "n(o)?", [&]{ SetState(preQuitState); }));
         cmds.push_back(Command("Quit Confirmation: Unknown", true, "", ".*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownQuitCmd); }));
     } else {
-        cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownQuitCmd); }));
+        cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownCmd); }));
     }
     
 

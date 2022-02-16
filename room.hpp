@@ -35,10 +35,11 @@ class Room {
         Room* paths[Direction::Count];
 
         std::vector<Item*> items;
+        std::vector<Command> commands;
 
     public:
 
-        Room(std::string _name, std::unordered_map<MessageType, std::string> _messages);
+        Room(std::string _name, std::unordered_map<MessageType, std::string> _messages, std::vector<Command> _commands);
 
         std::string GetName();
         std::string GetMessage(MessageType);
@@ -51,6 +52,8 @@ class Room {
         void RemoveItem(Item* i);
 
         void Link(Direction dir, Room& other, bool bothways = true);
+
+        std::vector<Command> GetCommands();
 };
 
 #endif /* __ROOM_HEADER__ */

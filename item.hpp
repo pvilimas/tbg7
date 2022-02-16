@@ -11,14 +11,16 @@ class Item {
 
         std::string name;
         std::string repr;
-
+        std::vector<Command> commands;
+        
     public:
 
         Item(std::string _name, std::string _repr);
 
         std::string GetName();
         std::string GetRepr();
-
+        std::vector<Command> GetCommands();
+        
 };
 
 #endif /* __ITEM_HEADER__ */

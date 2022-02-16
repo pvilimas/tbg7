@@ -19,6 +19,9 @@ class Player {
         Room *currentRoom;
 
         std::vector<Item*> inventory;
+
+        // auxmethod for repr inv 
+        inline std::string fullRepr(std::string itemRepr);
     
     public:
 
