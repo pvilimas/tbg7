@@ -87,6 +87,13 @@ std::string TextBasedGame::Messages::PromptQuit = "Do you want to quit? (y/n)";
 // TODO: functions here, to copy the exact verb the player used, unless it's invalid, in which case "what do you want to do?"
 //                                   ^ eg. "what do you want to pick up?"
 // maybe look at STR_KEYWORDS from tbg5/alpha/globals to get an idea
+
+// "go north" when there is no room there
+std::string TextBasedGame::Messages::ErrorBlockedDir = "You can't go that way.";
+// "go askdjad"
+std::string TextBasedGame::Messages::ErrorInvalidDir = "Which way do you want to go?";
+// "go"
+std::string TextBasedGame::Messages::ErrorMissingDir = "Which way do you want to go?";
 // "take key" -> "take key"
 std::string TextBasedGame::Messages::ErrorInvalidTake = "You're already carrying that!";
 // "take <item not in curr room>"
@@ -249,10 +256,12 @@ std::vector<Command> TextBasedGame::GetCommands() {
 
     // failsafes
     if (state == State::Gameplay) {
-        cmds.push_back(Command("Failsafe: Take/Drop/Use Invalid Item", true, "", "(take|drop|use) .*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownItem); }));
         cmds.push_back(Command("Failsafe: Missing Take", true, "", "take", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorMissingTake); }));
         cmds.push_back(Command("Failsafe: Missing Drop", true, "", "drop", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorMissingDrop); }));
         cmds.push_back(Command("Failsafe: Missing Use", true, "", "use", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorMissingUse); }));
+        cmds.push_back(Command("Failsafe: Take/Drop/Use Invalid Item", true, "", "(take|drop|use) .*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownItem); }));
+        cmds.push_back(Command("Failsafe: Missing Direction", true, "", "go", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorMissingDir); }));
+        cmds.push_back(Command("Failsafe: Invalid Direction", true, "", "go .*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorInvalidDir); }));
     }
     
     // quit conf
@@ -303,7 +312,7 @@ void TextBasedGame::TryMove(Direction dir) {
         player.Move(dir);
         WriteGameOutput(player.GetCurrentRoom()->GetMessage(Room::MessageType::OnEnter));
     } else {
-        WriteGameOutput("You can't go that way.");
+        WriteGameOutput(TextBasedGame::Messages::ErrorBlockedDir);
     }
 }
 
