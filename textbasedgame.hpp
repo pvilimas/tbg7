@@ -18,7 +18,7 @@ class Player {
 
         Room *currentRoom;
 
-        std::vector<Item*> inventory;
+        std::vector<std::shared_ptr<Item>> inventory;
 
         // auxmethod for repr inv 
         inline std::string fullRepr(std::string itemRepr);
@@ -30,12 +30,12 @@ class Player {
         Room *GetCurrentRoom();
         void SetCurrentRoom(Room* r);
 
-        std::vector<Item*> GetInventory();
+        std::vector<std::shared_ptr<Item>> GetInventory();
         std::string ReprInventory();
 
-        bool HasItem(Item* i);
-        void TakeItem(Item* i);
-        void DropItem(Item* i);
+        bool HasItem(std::shared_ptr<Item> i);
+        void TakeItem(std::shared_ptr<Item> i);
+        void DropItem(std::shared_ptr<Item> i);
 
         void Move(Direction dir);
 };
@@ -68,6 +68,9 @@ class TextBasedGame {
                 ErrorMissingDir,
                 ErrorInvalidTake,
                 ErrorInvalidTakeMissing,
+                ErrorIllegalTake,
+                ErrorIllegalUse,
+                ErrorIllegalUseThatWay,
                 ErrorInvalidUse,
                 ErrorInvalidDrop,
                 ErrorMissingTake,
@@ -91,6 +94,7 @@ class TextBasedGame {
         static DirectionSet Directions;
         
         TextBasedGame();
+        TextBasedGame(const TextBasedGame&) = delete;
         TextBasedGame(std::function<void(std::string)> _writeFunc);
 
         /* IO - keep these public */
@@ -107,9 +111,9 @@ class TextBasedGame {
         void TryMove(Direction dir);
 
         // contains failure check
-        void TryTakeItem(Item* i);
+        void TryTakeItem(std::shared_ptr<Item> i);
         // contains failure check
-        void TryDropItem(Item* i);
+        void TryDropItem(std::shared_ptr<Item> i);
     
 };
 

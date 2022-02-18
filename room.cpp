@@ -29,20 +29,20 @@ void Room::SetPath(Direction dir, Room *r) {
     paths[dir.id] = r;
 }
 
-bool Room::HasItem(Item* i) {
-    for (Item const *_i : items) {
-        if (i == _i) {
+bool Room::HasItem(std::shared_ptr<Item> i) {
+    for (auto _i : items) {
+        if (i->GetName() == _i->GetName()) {
             return true;
         }
     }
     return false;
 }
 
-void Room::AddItem(Item* i) {
+void Room::AddItem(std::shared_ptr<Item> i) {
     items.push_back(i);
 }
 
-void Room::RemoveItem(Item* i) {
+void Room::RemoveItem(std::shared_ptr<Item> i) {
     int count = 0;
     for (auto& _i : items) {
         if (i == _i) {

@@ -15,6 +15,7 @@ void Game::Init() {
     // do not make it resizable
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT | FLAG_WINDOW_UNDECORATED);
     InitWindow(Game::WinWidth, Game::WinHeight, "textbasedgame");
+    SetExitKey(0);
 
     roomImgTexture = LoadTexture("./assets/a.png");
 }

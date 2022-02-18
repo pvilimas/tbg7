@@ -1,6 +1,7 @@
 #ifndef __COMMAND_HEADER__
 #define __COMMAND_HEADER__
 
+#include <iostream>
 #include <string>
 #include <regex>
 

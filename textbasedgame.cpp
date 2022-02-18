@@ -14,7 +14,7 @@ void Player::SetCurrentRoom(Room* r) {
     currentRoom = r;
 }
 
-std::vector<Item*> Player::GetInventory() {
+std::vector<std::shared_ptr<Item>> Player::GetInventory() {
     return inventory;
 }
 
@@ -46,8 +46,8 @@ std::string Player::ReprInventory() {
     }
 }
 
-bool Player::HasItem(Item* i) {
-    for (Item const *_i : inventory) {
+bool Player::HasItem(std::shared_ptr<Item> i) {
+    for (auto _i : inventory) {
         if (i == _i) {
             return true;
         }
@@ -55,13 +55,13 @@ bool Player::HasItem(Item* i) {
     return false;
 }
 
-void Player::TakeItem(Item* i) {
+void Player::TakeItem(std::shared_ptr<Item> i) {
     inventory.push_back(i);
 }
 
-void Player::DropItem(Item* i) {
+void Player::DropItem(std::shared_ptr<Item> i) {
     int count = 0;
-    for (auto& _i : inventory) {
+    for (auto _i : inventory) {
         if (i == _i) {
             inventory.erase(inventory.begin()+count);
             return;
@@ -98,6 +98,12 @@ std::string TextBasedGame::Messages::ErrorMissingDir = "Which way do you want to
 std::string TextBasedGame::Messages::ErrorInvalidTake = "You're already carrying that!";
 // "take <item not in curr room>"
 std::string TextBasedGame::Messages::ErrorInvalidTakeMissing = "I don't see that in here.";
+// "take <item with CanCarry=false>"
+std::string TextBasedGame::Messages::ErrorIllegalTake = "You can't pick that up.";
+// "take <item with CanUse=false>"
+std::string TextBasedGame::Messages::ErrorIllegalUse = "You can't use that.";
+// nonsense use like "unlock door with ice cube"
+std::string TextBasedGame::Messages::ErrorIllegalUseThatWay = "You can't use it that way.";
 // "use <unusable item>"
 std::string TextBasedGame::Messages::ErrorInvalidUse = "You can't use that.";
 // "drop key" -> "drop key"
@@ -152,11 +158,11 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
             "Bedroom",
             std::unordered_map<Room::MessageType, std::string> {
                 { Room::MessageType::OnEnter, "You have entered the bedroom." },
-                { Room::MessageType::OnLook, "You are in the bedroom. A red key door is across from the bed." },
+                { Room::MessageType::OnLook, "You are in the bedroom. A blue door is across from the bed." },
                 { Room::MessageType::OnStay, "You are in the bedroom." },
             },
             std::vector<Command> {
-                Command("Bedroom: Sleep", false, "sleep in bed", "sleep(in (the )?bed)?", [*this]{ WriteGameOutput("You slept in the bed. You woke up feeling refreshed."); })
+                Command("Bedroom: Sleep", false, "sleep in bed", "sleep(in (the )?bed)?", [&]{ WriteGameOutput("You slept in the bed. You woke up feeling refreshed."); })
             }
         )},
     };
@@ -168,19 +174,84 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
     // init items
 
     items = {
-        {"Red Key", std::make_shared<Item>(
-            "Red Key", "red key", std::vector<Command>{}
-        )},
-        {"Red Door", std::make_shared<Item>(
-            "Red Door", "red door", std::vector<Command>{
-                Command("Red Door: Open", false, "", "open (red )?door", [*this]{ WriteGameOutput("You opened the red door."); })
+        {"Test Item 1", std::make_shared<Item>(
+            "Test Item 1", "test item 1",
+            std::vector<Command>{
+//                Command("Test Item 1: Take", false, "", "take t1", [this]{ std::cout << __LINE__ << std::endl;TryTakeItem(items.at("Test Item 1"));std::cout << __LINE__ << std::endl; }),
+                Command("Test Item 1: Use", false, "", "use t1", [&]{ WriteGameOutput("You used t1."); }),
+//                Command("Test Item 1: Drop", false, "", "drop t1", [this]{ TryDropItem(items.at("Test Item 1")); }),
+            },
+            Item::Attrs {
+                .CanCarry = true,
+                .CanUse = true,
             }
         )},
+        {"Red Key", std::make_shared<Item>(
+            "Red Key", "red key",
+            std::vector<Command>{
+//                Command("Red Key: Take", false, "", "take (red )?key", [this]{ TryTakeItem(items.at("Red Key")); }),
+//                Command("Red Key: Use", false, "", "use (red )?key", [&]{ WriteGameOutput("You can't use that."); }),
+//                Command("Red Key: Drop", false, "", "drop (red )?key", [this]{ TryDropItem(items.at("Red Key")); }),
+            },
+            Item::Attrs {
+                .CanCarry = true,
+                .CanUse = true,
+            }
+        )},
+        {"Blue Door", std::make_shared<Item>(
+            "Blue Door", "blue door",
+            std::vector<Command>{
+//                Command("Blue Door: Take", false, "", "take (blue )?door", [&]{ WriteGameOutput("That's way too heavy."); }),
+//                Command("Blue Door: Use", false, "", "use (blue )?door", [&]{ WriteGameOutput("You can't use that."); }),
+//                Command("Blue Door: Drop", false, "", "drop (blue )?door", [&]{ WriteGameOutput("You aren't carrying that."); }),
+//                Command("Blue Door: Open", false, "", "open (blue )?door", [&]{ WriteGameOutput("You opened the blue door."); })
+            },
+            Item::Attrs {
+                .CanCarry = false,
+                .CanUse = true,
+            }
+        )},
+        {"Test Item 2", std::make_shared<Item>(
+            "Test Item 2", "test item 2",
+            std::vector<Command>{
+//                Command("Test Item 2: Take", false, "", "take t2", [this]{ TryTakeItem(items.at("Test Item 2")); }),
+//                Command("Test Item 2: Use", false, "", "use t2", [&]{ WriteGameOutput("You used t2."); }),
+//                Command("Test Item 2: Drop", false, "", "drop t2", [this]{ TryDropItem(items.at("Test Item 2")); }),
+            },
+            Item::Attrs {
+                .CanCarry = true,
+                .CanUse = true,
+            }
+        )},
+        {"Test Item 3", std::make_shared<Item>(
+            "Test Item 3", "test item 3",
+            std::vector<Command>{
+//                Command("Test Item 3: Take", false, "", "take t3", [this]{ TryTakeItem(items.at("Test Item 3")); }),
+//                Command("Test Item 3: Use", false, "", "use t3", [this]{ WriteGameOutput("You used t3."); }),
+//                Command("Test Item 3: Drop", false, "", "drop t3", [this]{ TryDropItem(items.at("Test Item 3")); }),
+            },
+            Item::Attrs {
+                .CanCarry = true,
+                .CanUse = true,
+            }
+        )}
     };
 
+    // add items to rooms
+
+    rooms.at("Bedroom")->AddItem(items.at("Blue Door"));
+    rooms.at("Kitchen")->AddItem(items.at("Test Item 1"));
+    rooms.at("Kitchen")->AddItem(items.at("Test Item 2"));
+    rooms.at("Kitchen")->AddItem(items.at("Test Item 3"));
+
+    // init npcs
+
+    // add npcs to rooms
+
+    // set up player
 
     player.SetCurrentRoom(&*rooms.at("Kitchen"));
-    player.TakeItem(&*items.at("Red Key"));
+    player.TakeItem(items.at("Red Key"));
 
     WriteGameOutput(TextBasedGame::Messages::Title);
 
@@ -189,7 +260,9 @@ TextBasedGame::TextBasedGame(std::function<void(std::string)> _writeFunc) {
 void TextBasedGame::EvalPlayerInput(std::string s) {
 
     for (Command& c : GetCommands()) {
+        std::cout << c.GetName() << std::endl;
         if (c.Eval(s)) {
+        std::cout << "> " << c.GetName() << std::endl;
             break;
         }
     }
@@ -238,11 +311,12 @@ std::vector<Command> TextBasedGame::GetCommands() {
         for (auto& it : items) {
             auto name = it.first;
             auto item = it.second;
-
+            std::cout << "adding command for item " << name << " aka " << item->GetName() << std::endl;
+            
             // standard item cmds
-            cmds.push_back(Command("Take" + name, false, "", "take " + name, [&]{ TryTakeItem(&*item); }));
-            cmds.push_back(Command("Use" + name, false, "", "use " + name, [&]{ WriteGameOutput("You used the " + item->GetRepr() + "."); }));
-            cmds.push_back(Command("Drop" + name, false, "", "drop " + name, [&]{ TryDropItem(&*item); }));
+            cmds.push_back(Command("Take " + name, false, "", "take " + name, [&]{ std::cout<<"Will take " <<item->GetName()<<std::endl; TryTakeItem(item); }));
+            cmds.push_back(Command("Use " + name, false, "", "use " + name, [&]{ WriteGameOutput("You used the " + item->GetRepr() + "."); }));
+            cmds.push_back(Command("Drop " + name, false, "", "drop " + name, [&]{ TryDropItem(item); }));
 
             // special item cmds
             for (Command c : item->GetCommands()) {
@@ -272,7 +346,6 @@ std::vector<Command> TextBasedGame::GetCommands() {
     } else {
         cmds.push_back(Command("Failsafe: Match All", true, "", ".*", [&]{ WriteGameOutput(TextBasedGame::Messages::ErrorUnknownCmd); }));
     }
-    
 
     return cmds;
 }
@@ -316,19 +389,27 @@ void TextBasedGame::TryMove(Direction dir) {
     }
 }
 
-void TextBasedGame::TryTakeItem(Item* i) {
+void TextBasedGame::TryTakeItem(std::shared_ptr<Item> i) {
+    std::cout << __LINE__ << std::endl;
+    WriteGameOutput("You tried to take " + i->GetName() + ".");
+    std::cout << __LINE__ << std::endl;
     if (player.HasItem(i)) {
+    std::cout << __LINE__ << std::endl;
         WriteGameOutput(TextBasedGame::Messages::ErrorInvalidTake);
     } else if (!player.GetCurrentRoom()->HasItem(i)) {
+    std::cout << __LINE__ << std::endl;
         WriteGameOutput(TextBasedGame::Messages::ErrorInvalidTakeMissing);
     } else {
+    std::cout << __LINE__ << std::endl;
         player.TakeItem(i);
         player.GetCurrentRoom()->RemoveItem(i);
         WriteGameOutput("You picked up the " + i->GetRepr() + ".");
+    std::cout << __LINE__ << std::endl;
     }
 }
 
-void TextBasedGame::TryDropItem(Item* i) {
+void TextBasedGame::TryDropItem(std::shared_ptr<Item> i) {
+    WriteGameOutput("You tried to drop " + i->GetName() + ".");
     if (!player.HasItem(i)) {
         WriteGameOutput(TextBasedGame::Messages::ErrorInvalidDrop);
     } else {

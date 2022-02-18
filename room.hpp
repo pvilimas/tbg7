@@ -34,7 +34,7 @@ class Room {
         // TODO: replace with map
         Room* paths[Direction::Count];
 
-        std::vector<Item*> items;
+        std::vector<std::shared_ptr<Item>> items;
         std::vector<Command> commands;
 
     public:
@@ -47,9 +47,9 @@ class Room {
         Room *GetPath(Direction dir);
         void SetPath(Direction dir, Room *r);
 
-        bool HasItem(Item* i);
-        void AddItem(Item* i);
-        void RemoveItem(Item* i);
+        bool HasItem(std::shared_ptr<Item> i);
+        void AddItem(std::shared_ptr<Item> i);
+        void RemoveItem(std::shared_ptr<Item> i);
 
         void Link(Direction dir, Room& other, bool bothways = true);
 

@@ -3,9 +3,10 @@
 /*
     TODO:
 
-    - paginate output ("...", hit enter to see next page)
-
+    - fix item aliasing
     - item attrs: can take, can use, can use without picking up
+    - standardize attrs 
+    - paginate output ("...", hit enter to see next page)
 
     - regex collect
         # allows you to pass in a list of regex strings and joins them into one string (inefficiently - can be a long string)
